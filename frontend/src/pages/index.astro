@@ -1,0 +1,114 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Card from "../components/Card.astro";
+---
+
+<Layout title="AWS Amplify + Elasticbeanstalk + Sagemaker demo">
+	<main>
+		<div class="container mx-auto">
+			<div class="flex flex-col">
+				<h1>
+					Amplify + Elasticbeanstalk <span class="text-gradient">Demo</span>
+				</h1>
+				<div class="flex flex-row gap-x-3">
+					<p class="instructions">
+						Predict your future salary in DataScience using the dataset
+						from Kaggle (<a href="https://www.kaggle.com/datasets/lainguyn123/data-science-salary-landscape" class="link">link</a>).
+					</p>
+					<div class="action">
+						<a href="/form" class="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-purple-600 dark:hover:bg-purple-700 focus:outline-none dark:focus:ring-purple-800">Predict your salary</a>
+					</div>
+				</div>
+				<ul role="list" class="link-card-grid">
+					<Card
+						href="https://aws.amazon.com/amplify/"
+						title="AWS Amplify Documentation"
+						body="Accelerate your full-stack web and mobile app development with AWS Amplify."
+					/>
+					<Card
+						href="https://aws.amazon.com/elasticbeanstalk/"
+						title="AWS Elastic Beanstalk"
+						body="Learn how AWS Elastic Beanstalk works and explore the official docs."
+					/>
+					<Card
+						href="https://aws.amazon.com/sagemaker/"
+						title="Amazon SageMaker"
+						body="With SageMaker, you can build, train and deploy ML models at scale using tools like notebooks, debuggers, profilers, pipelines, MLOps, and more – all in one"
+					/>
+					<Card
+						href="https://astro.build/chat/"
+						title="Read the blog post"
+						body="Read the blog post associated to this demo"
+					/>
+				</ul>
+			</div>
+		</div>
+	</main>
+</Layout>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1rem;
+		width: 800px;
+		max-width: calc(100% - 2rem);
+		font-size: 20px;
+		line-height: 1.6;
+	}
+	.astro-a {
+		position: absolute;
+		top: -32px;
+		left: 50%;
+		transform: translatex(-50%);
+		width: 220px;
+		height: auto;
+		z-index: -1;
+	}
+
+	.text-gradient {
+		background-image: var(--accent-gradient);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-size: 400%;
+		background-position: 0%;
+	}
+	.instructions {
+		margin-bottom: 2rem;
+		border: 1px solid rgba(var(--accent-light), 25%);
+		background: linear-gradient(
+			rgba(var(--accent-dark), 66%),
+			rgba(var(--accent-dark), 33%)
+		);
+		padding: 1.5rem;
+		border-radius: 8px;
+		@apply basis-1/2;
+	}
+	.action {
+		margin-bottom: 2rem;
+		border: 1px solid rgba(var(--accent-light), 25%);
+		background: rgba(var(--accent-light), 40%);
+		padding: 1.5rem;
+		border-radius: 8px;
+		@apply basis-1/2 flex flex-col items-center justify-center;
+	} 
+	.instructions code {
+		font-size: 0.8em;
+		font-weight: bold;
+		background: rgba(var(--accent-light), 12%);
+		color: rgb(var(--accent-light));
+		border-radius: 4px;
+		padding: 0.3em 0.4em;
+	}
+	.instructions strong {
+		color: rgb(var(--accent-light));
+	}
+	.link-card-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
+		gap: 2rem;
+		padding: 0;
+	}
+	.link {
+		@apply font-medium text-purple-600 dark:text-purple-500 hover:underline
+	}
+</style>
