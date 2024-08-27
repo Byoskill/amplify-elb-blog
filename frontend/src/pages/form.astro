@@ -4,8 +4,6 @@ import InputNumber from "../components/forms/InputNumber.astro";
 import InputChoice from "../components/forms/InputChoice.astro";
 import { iso31661, type IsoCode } from "../lib/iso";
 
-const errors = { username: "", email: "", password: "" };
-
 const default_experience_levels = [
   { key: "EN", value: "Entry-level" },
   { key: "MI", value: "MI Junior Mid-level" },
@@ -36,40 +34,8 @@ const companySize = [
   { key: "L", value: "Large: more than 250 employees" },
 ];
 
-console.log("Astro", Astro.request.method);
+const PUBLIC_BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
 
-if (Astro.request.method === "POST") {
-  try {
-    console.log("Redirect");
-    /*  const data = await Astro.request.formData();
-    const name = data.get("username");
-    const email = data.get("email");
-    const password = data.get("password");
-    // Do something with the data
-    if (typeof name !== "string" || name.length < 1) {
-      errors.username += "Please enter a username. ";
-    }
-    if (typeof email !== "string" || !isValidEmail(email)) {
-      errors.email += "Email is not valid. ";
-    } else if (await isRegistered(email)) {
-      errors.email += "Email is already registered. ";
-    }
-    if (typeof password !== "string" || password.length < 6) {
-      errors.password += "Password must be at least 6 characters. ";
-    }
-    const hasErrors = Object.values(errors).some((msg) => msg);
-    if (!hasErrors) {
-      await registerUser({ name, email, password });
-      return Astro.redirect("/login");
-    }
-      */
-    Astro.redirect("/prediction");
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-  }
-}
 ---
 
 <Layout title="AWS Amplify + Elasticbeanstalk + Sagemaker demo">
@@ -85,7 +51,7 @@ if (Astro.request.method === "POST") {
     <form
       class="max-w-md mx-auto my-10"
       method="POST"
-      action="/api/predictions"
+      action={PUBLIC_BACKEND_URL + "/api/v1/predict"}
     >
       <InputNumber name="working_year" title="Number of working years" />
       <InputChoice

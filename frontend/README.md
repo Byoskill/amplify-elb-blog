@@ -4,7 +4,7 @@
 
 The demo is based on the usecase and dataset from [Kaggle](https://www.kaggle.com/datasets/ruchi798/data-science-job-salaries).
 
-## How to compile the demo project locally
+## How to compile the Frontend project locally
 
 ```sh
 npm create astro@latest -- --template basics
@@ -51,6 +51,24 @@ All commands are run from the root of the project, from a terminal:
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
+
+To launch the frontend  in dev mode 
+
+```bash
+PUBLIC_BACKEND_URL=http://localhost:8000 npm run dev
+```
+
 ### 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+### How to build the backend locally
+
+Here are the following instructions to launch the backend : 
+
+̀```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+̀```
+
