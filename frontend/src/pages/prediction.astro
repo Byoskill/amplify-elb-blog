@@ -1,0 +1,156 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="AWS Amplify + Elasticbeanstalk + Sagemaker demo">
+  <main>
+    <h1>
+      Amplify + Elasticbeanstalk <span class="text-gradient">Demo</span>
+    </h1>
+    <div class="flex justify-center">
+      <div
+        class="bg-gray-100 dark:bg-gray-800 shadow-lg rounded-lg p-8 max-w-lg w-full"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-center">
+            Salary Prediction Result
+          </h2>
+        </div>
+
+        <!-- Displaying Input Parameters -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold">Input Parameters:</h3>
+          <ul class="list-disc list-inside">
+            <li>Working Year: <span id="workingYear">5</span></li>
+            <li>Experience Level: <span id="experienceLevel">EN</span></li>
+            <li>Employment Type: <span id="employmentType">PT</span></li>
+            <li>Remote Ratio: <span id="remoteRatio">50%</span></li>
+            <li>
+              Employment Residence: <span id="employmentResidence">BF</span>
+            </li>
+            <li>Company Location: <span id="companyLocation">BL</span></li>
+            <li>Company Size: <span id="companySize">S</span></li>
+          </ul>
+        </div>
+
+        <!-- Displaying Predicted Salary -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold">Estimated Salary:</h3>
+          <p class="text-3xl font-bold text-green-500">
+            $<span id="estimatedSalary">45,000</span>
+          </p>
+        </div>
+
+        <!-- Graph for Salary Range -->
+        <div>
+          <h3 class="text-lg font-semibold">Salary Range:</h3>
+          <div class="relative h-4 bg-gray-200 dark:bg-gray-700 rounded">
+            <div
+              id="minSalary"
+              class="absolute left-0 h-full bg-blue-500 rounded-l"
+              style="width: 30%;"
+            >
+            </div>
+            <div
+              id="maxSalary"
+              class="absolute right-0 h-full bg-blue-500 rounded-r"
+              style="width: 50%;"
+            >
+            </div>
+          </div>
+          <div class="flex justify-between text-sm mt-2">
+            <span id="minSalaryLabel">$40,000</span>
+            <span id="maxSalaryLabel">$60,000</span>
+          </div>
+        </div>
+
+        <!-- Button to Request Another Simulation -->
+        <div class="mt-8 flex justify-center">
+          <a
+            href="/form"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Request Another Simulation
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    // Function to update the page with the actual data
+    function updateSalaryPrediction(data) {
+      document.getElementById("workingYear").textContent = data.working_year;
+      document.getElementById("experienceLevel").textContent =
+        data.experience_level;
+      document.getElementById("employmentType").textContent =
+        data.employment_type;
+      document.getElementById("remoteRatio").textContent =
+        data.remote_ratio + "%";
+      document.getElementById("employmentResidence").textContent =
+        data.employment_residence;
+      document.getElementById("companyLocation").textContent =
+        data.company_location;
+      document.getElementById("companySize").textContent = data.company_size;
+
+      document.getElementById("estimatedSalary").textContent =
+        data.estimated_salary.toLocaleString();
+
+      // Update the salary range graph
+      const minPercent = (data.min_salary / data.max_salary) * 100;
+      document.getElementById("minSalary").style.width = minPercent + "%";
+      document.getElementById("maxSalary").style.width = 100 - minPercent + "%";
+
+      document.getElementById("minSalaryLabel").textContent =
+        `$${data.min_salary.toLocaleString()}`;
+      document.getElementById("maxSalaryLabel").textContent =
+        `$${data.max_salary.toLocaleString()}`;
+    }
+
+    // Example data, replace this with the actual API call data
+    const exampleData = {
+      working_year: 10,
+      experience_level: "EN",
+      employment_type: "PT",
+      remote_ratio: 50,
+      employment_residence: "BF",
+      company_location: "BL",
+      company_size: "S",
+      estimated_salary: 45000,
+      min_salary: 40000,
+      max_salary: 60000,
+    };
+
+    // Call the update function with example data
+    updateSalaryPrediction(exampleData);
+  </script>
+</Layout>
+
+<style>
+  h2 {
+    @apply font-semibold text-2xl;
+  }
+  main {
+    margin: auto;
+    padding: 1rem;
+    width: 800px;
+    max-width: calc(100% - 2rem);
+    font-size: 20px;
+    line-height: 1.6;
+  }
+  .astro-a {
+    position: absolute;
+    top: -32px;
+    left: 50%;
+    transform: translatex(-50%);
+    width: 220px;
+    height: auto;
+    z-index: -1;
+  }
+  h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    margin-bottom: 1em;
+  }
+</style>

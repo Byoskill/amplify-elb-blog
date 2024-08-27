@@ -1,23 +1,32 @@
 ---
 interface Choice {
-    key: string;
-    value: string;
+  key: string;
+  value: string;
 }
 interface Props {
-	title: string;
-	name: string;
-    choices: Choice[]
+  title: string;
+  name: string;
+  choices: Choice[];
 }
 
 const { title, name, choices } = Astro.props;
 ---
 
 <div class="relative z-0 w-full my-1 py-3 group">
-    <label for={name} class="block mb-2 text-sm text-sm text-gray-500 dark:text-gray-400">{title}</label>
-    <select id={name} class="border border-gray-500 text-sm text-gray-500 dark:text-gray-400 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
-      <option selected>Select an option</option>
-      {
-        choices.map((choice) => <option value={choice.key}>{choice.value}</option>)
-      }
-    </select>
+  <label for={name} class="block mb-2 text-sm text-gray-500 dark:text-gray-400"
+    >{title}</label
+  >
+  <select
+    id={name}
+    name={name}
+    class="border border-gray-500 text-sm text-gray-500 dark:text-gray-400 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+    required
+  >
+    <option selected value="">Select an option</option>
+    {
+      choices.map((choice) => (
+        <option value={choice.key}>{choice.value}</option>
+      ))
+    }
+  </select>
 </div>

@@ -1,6 +1,6 @@
 ---
 interface Props {
-	title: string;
+  title: string;
 }
 
 const { title } = Astro.props;
@@ -8,84 +8,91 @@ const { title } = Astro.props;
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-		<style is:global>
-			@tailwind base;
-			@tailwind components;
-			@tailwind utilities;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Astro description" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <style is:global>
+      @tailwind base;
+      @tailwind components;
+      @tailwind utilities;
 
-			:root {
-				--accent: 136, 58, 234;
-				--accent-light: 224, 204, 250;
-				--accent-dark: 49, 10, 101;
-				--accent-gradient: linear-gradient(
-					45deg,
-					rgb(var(--accent)),
-					rgb(var(--accent-light)) 30%,
-					white 60%
-				);
-			}
-			html {
-				font-family: system-ui, sans-serif;
-				@apply bg-white dark:bg-black dark:text-white;
-			}
-			
-			code {
-				font-family:
-					Menlo,
-					Monaco,
-					Lucida Console,
-					Liberation Mono,
-					DejaVu Sans Mono,
-					Bitstream Vera Sans Mono,
-					Courier New,
-					monospace;
-			}
-			h1 {
-				font-size: 4rem;
-				font-weight: 700;
-				line-height: 1;
-				text-align: center;
-				margin-bottom: 1em;
-				@apply dark:text-white;
-			}
-		</style>
-	</head>
-	<body>
-		<slot />
-		<div class="flex flex-auto justify-center ml-3">
-			<div class="flex items-center mb-4">
-				<input
-					type="checkbox"
-					name="light-switch"
-					class="light-switch w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-				/>
-				<label
-					for="light-switch"
-					class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-					>Switch light/dark theme</label
-				>
-			</div>
-		</div>
-		<script src="/switch.js" type="text/javascript"></script>
-		<script>
-			if (
-				localStorage.getItem("dark-mode") === "true" ||
-				(!("dark-mode" in localStorage) &&
-					window.matchMedia("(prefers-color-scheme: dark)").matches)
-			) {
-				console.log("Dark");
-				document.querySelector("html").classList.add("dark");
-			} else {
-				console.log("Pas Dark");
-				document.querySelector("html").classList.remove("dark");
-			}
-		</script>
-	</body>
+      :root {
+        --accent: 136, 58, 234;
+        --accent-light: 224, 204, 250;
+        --accent-dark: 49, 10, 101;
+        --accent-gradient: linear-gradient(
+          45deg,
+          rgb(var(--accent)),
+          rgb(var(--accent-light)) 30%,
+          white 60%
+        );
+      }
+      html {
+        font-family: system-ui, sans-serif;
+        @apply bg-white dark:bg-black dark:text-white;
+      }
+
+      code {
+        font-family:
+          Menlo,
+          Monaco,
+          Lucida Console,
+          Liberation Mono,
+          DejaVu Sans Mono,
+          Bitstream Vera Sans Mono,
+          Courier New,
+          monospace;
+      }
+      h1 {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        margin-bottom: 1em;
+        @apply dark:text-white;
+      }
+      .text-gradient {
+        background-image: var(--accent-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: 400%;
+        background-position: 0%;
+      }
+    </style>
+  </head>
+  <body>
+    <slot />
+    <div class="flex flex-auto justify-center ml-3">
+      <div class="flex items-center mb-4">
+        <input
+          type="checkbox"
+          name="light-switch"
+          class="light-switch w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+        />
+        <label
+          for="light-switch"
+          class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+          >Switch light/dark theme</label
+        >
+      </div>
+    </div>
+    <script src="/switch.js" type="text/javascript"></script>
+    <script>
+      if (
+        localStorage.getItem("dark-mode") === "true" ||
+        (!("dark-mode" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        console.log("Dark");
+        document.querySelector("html").classList.add("dark");
+      } else {
+        console.log("Pas Dark");
+        document.querySelector("html").classList.remove("dark");
+      }
+    </script>
+  </body>
 </html>

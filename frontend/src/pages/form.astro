@@ -2,150 +2,156 @@
 import Layout from "../layouts/Layout.astro";
 import InputNumber from "../components/forms/InputNumber.astro";
 import InputChoice from "../components/forms/InputChoice.astro";
+import { iso31661, type IsoCode } from "../lib/iso";
 
 const errors = { username: "", email: "", password: "" };
 
 const default_experience_levels = [
-    { key : "EN", value: "Entry-level"},
-    { key : "MI", value: "MI Junior Mid-level"},
-    { key : "SE", value: "Intermediate Senior-level"},
-    { key : "EX", value: "Expert Executive-level / Director"}
+  { key: "EN", value: "Entry-level" },
+  { key: "MI", value: "MI Junior Mid-level" },
+  { key: "SE", value: "Intermediate Senior-level" },
+  { key: "EX", value: "Expert Executive-level / Director" },
 ];
 
 const default_employment_types = [
-    { key : "PT", value: "Part-time"},
-    { key : "FT", value: "Full-time"},
-    { key : "CT", value: "Contract"},
-    { key : "FL", value: "Freelance"}
+  { key: "PT", value: "Part-time" },
+  { key: "FT", value: "Full-time" },
+  { key: "CT", value: "Contract" },
+  { key: "FL", value: "Freelance" },
 ];
-
 
 const default_remote_ratios = [
-    { key : "0", value: "No remote work (less than 20%) "},
-    { key : "50", value: "Partially remote "},
-    { key : "100", value: "Fully remote (more than 80%)"},
+  { key: "0", value: "No remote work (less than 20%) " },
+  { key: "50", value: "Partially remote " },
+  { key: "100", value: "Fully remote (more than 80%)" },
 ];
 
+const isoCodes = iso31661.map((isoC: IsoCode) => {
+  return { key: isoC.alpha2, value: isoC.alpha2 + ": " + isoC.name };
+});
+
+const companySize = [
+  { key: "S", value: "Small: less than 50 employees" },
+  { key: "M", value: "Medium: 50 to 250 employees" },
+  { key: "L", value: "Large: more than 250 employees" },
+];
+
+console.log("Astro", Astro.request.method);
 
 if (Astro.request.method === "POST") {
-    try {
-        const data = await Astro.request.formData();
-        const name = data.get("username");
-        const email = data.get("email");
-        const password = data.get("password");
-        // Do something with the data
-        if (typeof name !== "string" || name.length < 1) {
-            errors.username += "Please enter a username. ";
-        }
-        if (typeof email !== "string" || !isValidEmail(email)) {
-            errors.email += "Email is not valid. ";
-        } else if (await isRegistered(email)) {
-            errors.email += "Email is already registered. ";
-        }
-        if (typeof password !== "string" || password.length < 6) {
-            errors.password += "Password must be at least 6 characters. ";
-        }
-        const hasErrors = Object.values(errors).some((msg) => msg);
-        if (!hasErrors) {
-            await registerUser({ name, email, password });
-            return Astro.redirect("/login");
-        }
-    } catch (error) {
-        if (error instanceof Error) {
-            console.error(error.message);
-        }
+  try {
+    console.log("Redirect");
+    /*  const data = await Astro.request.formData();
+    const name = data.get("username");
+    const email = data.get("email");
+    const password = data.get("password");
+    // Do something with the data
+    if (typeof name !== "string" || name.length < 1) {
+      errors.username += "Please enter a username. ";
     }
+    if (typeof email !== "string" || !isValidEmail(email)) {
+      errors.email += "Email is not valid. ";
+    } else if (await isRegistered(email)) {
+      errors.email += "Email is already registered. ";
+    }
+    if (typeof password !== "string" || password.length < 6) {
+      errors.password += "Password must be at least 6 characters. ";
+    }
+    const hasErrors = Object.values(errors).some((msg) => msg);
+    if (!hasErrors) {
+      await registerUser({ name, email, password });
+      return Astro.redirect("/login");
+    }
+      */
+    Astro.redirect("/prediction");
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
 }
-
-
-
 ---
 
 <Layout title="AWS Amplify + Elasticbeanstalk + Sagemaker demo">
-    <main>      
-        <h1>
-            Amplify + Elasticbeanstalk <span class="text-gradient">Demo</span>
-        </h1>
-        <p class="instructions">
-            Enter the required informations to predict your future salary in
-            DataScience.
-        </p>
-        
-        <form class="max-w-md mx-auto my-10">
-            <InputNumber name="working_year" title="Number of working years"></InputNumber>
-            <InputChoice name="experience_level" title="Experience level" choices={default_experience_levels}></InputChoice>
-            <InputChoice name="employment_type" title="Employment type" choices={default_employment_types}></InputChoice>
-            <InputChoice name="remote_ratio" title="Remote ratio" choices={default_remote_ratios}></InputChoice>
-            <InputChoice name="employment_residence" title="Employment resident" choices={default_remote_ratios}></InputChoice>
-            <InputChoice name="company_location" title="Company location" choices={default_remote_ratios}></InputChoice>
-            <InputChoice name="company_siye" title="Company size" choices={default_remote_ratios}></InputChoice>
-            
-            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
-          </form>
-          
-        <form method="POST">            
-            <label>
-                Email:
-                <input type="text" name="experience_level" required />
-            </label>
-            {errors.email && <p>{errors.email}</p>}
-            <label>
-                The type of employment for the role:
-                <input type="number" name="employment_type" required />
-            </label>
-            {errors.password && <p>{errors.password}</p>}
-            <label>
-                Remote ratio:
-                <input type="number" name="remote_ratio" required />
-            </label>
-            <label>
-                Employment residence:
-                <input type="text" name="employment_type" required />
-            </label>
-            <label>
-                Company location:
-                <input type="number" name="company_location" required />
-            </label>
-            <label>
-                Company size:
-                <input type="number" name="company_size" required />
-            </label>
-            <button>Estimate your future salary</button>
-        </form>        
-    </main>
+  <main>
+    <h1>
+      Amplify + Elasticbeanstalk <span class="text-gradient">Demo</span>
+    </h1>
+    <p class="instructions">
+      Enter the required informations to predict your future salary in
+      DataScience.
+    </p>
+
+    <form
+      class="max-w-md mx-auto my-10"
+      method="POST"
+      action="/api/predictions"
+    >
+      <InputNumber name="working_year" title="Number of working years" />
+      <InputChoice
+        name="experience_level"
+        title="Experience level"
+        choices={default_experience_levels}
+      />
+      <InputChoice
+        name="employment_type"
+        title="Employment type"
+        choices={default_employment_types}
+      />
+      <InputChoice
+        name="remote_ratio"
+        title="Remote ratio"
+        choices={default_remote_ratios}
+      />
+      <InputChoice
+        name="employment_residence"
+        title="Employment resident"
+        choices={isoCodes}
+      />
+      <InputChoice
+        name="company_location"
+        title="Company location"
+        choices={isoCodes}
+      />
+      <InputChoice
+        name="company_size"
+        title="Company size"
+        choices={companySize}
+      />
+
+      <button
+        type="submit"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+      >
+        Predict your salary
+      </button>
+    </form>
+  </main>
 </Layout>
 
 <style>
-    main {
-        margin: auto;
-        padding: 1rem;
-        width: 800px;
-        max-width: calc(100% - 2rem);
-        font-size: 20px;
-        line-height: 1.6;
-    }
-    .astro-a {
-        position: absolute;
-        top: -32px;
-        left: 50%;
-        transform: translatex(-50%);
-        width: 220px;
-        height: auto;
-        z-index: -1;
-    }
-    h1 {
-        font-size: 4rem;
-        font-weight: 700;
-        line-height: 1;
-        text-align: center;
-        margin-bottom: 1em;
-    }
-    .text-gradient {
-        background-image: var(--accent-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-size: 400%;
-        background-position: 0%;
-    }
-    
+  main {
+    margin: auto;
+    padding: 1rem;
+    width: 800px;
+    max-width: calc(100% - 2rem);
+    font-size: 20px;
+    line-height: 1.6;
+  }
+  .astro-a {
+    position: absolute;
+    top: -32px;
+    left: 50%;
+    transform: translatex(-50%);
+    width: 220px;
+    height: auto;
+    z-index: -1;
+  }
+  h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    margin-bottom: 1em;
+  }
 </style>
