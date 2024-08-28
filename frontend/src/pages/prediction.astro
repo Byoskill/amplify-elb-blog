@@ -1,5 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+const PUBLIC_BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
 ---
 
 <Layout title="AWS Amplify + Elasticbeanstalk + Sagemaker demo">
@@ -33,8 +35,9 @@ import Layout from "../layouts/Layout.astro";
           </ul>
         </div>
 
+        <div class="mb-12" id="predictionResult">
         <!-- Displaying Predicted Salary -->
-        <div class="mb-12">
+        <div class="mb-12" >
           <h3 class="text-lg font-semibold">Estimated Salary:</h3>
           <p class="text-3xl font-bold text-green-500">
             $<span id="estimatedSalary">45,000</span>
@@ -42,7 +45,7 @@ import Layout from "../layouts/Layout.astro";
         </div>
 
         <!-- Graph for Salary Range -->
-        <div>
+        
           <h3 class="text-lg font-semibold mb-4">Salary Range:</h3>
           <div class="relative h-4 bg-gray-200 dark:bg-gray-700 rounded">
             <div
@@ -76,7 +79,7 @@ import Layout from "../layouts/Layout.astro";
       </div>
     </div>
   </main>
-  <script>
+  <script define:vars={{ PUBLIC_BACKEND_URL: PUBLIC_BACKEND_URL }}>
     // Function to update the page with the actual data
     function updateSalaryPrediction(data) {
       document.getElementById("workingYear").textContent = data.working_year;
@@ -106,23 +109,97 @@ import Layout from "../layouts/Layout.astro";
         `$${data.max_salary.toLocaleString()}`;
     }
 
+    function getPredictionIdFromUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get("prediction");
+    }
+
+    async function fetchPredictionStatus(predictionId) {
+      const response = await fetch(
+        `${PUBLIC_BACKEND_URL}/api/v1/prediction/status/${predictionId}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        },
+      );
+      return response.json();
+    }
+
+    async function fetchPredictionData(predictionId) {
+      const response = await fetch(
+        `${PUBLIC_BACKEND_URL}/api/v1/prediction/${predictionId}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        },
+      );
+      return response.json();
+    }
+
+    async function updatePageWithPrediction(predictionId, backup, timer) {
+      const predictionData = await fetchPredictionData(predictionId);
+      updateSalaryPrediction(predictionData);
+      document.getElementById("predictionResult").innerHTML = backup;
+      clearInterval(timer);
+  }
+
+    // Client-side code to run after the page loads
+    window.addEventListener("DOMContentLoaded", () => {
+      const predictionId = getPredictionIdFromUrl();
+      if (predictionId) {
+        console.log("Prediction id", predictionId);
+        const backup = document.getElementById("predictionResult").innerHTML;
+        let attempts = 0;
+        const timer = setInterval(async () => {
+          attempts++;
+          try {
+            const statusResponse = await fetchPredictionStatus(predictionId);
+
+            if (statusResponse.status === "success") {
+              await updatePageWithPrediction(predictionId, backup, timer); // Stop the timer when successful
+              
+            }
+          } catch (error) {
+            console.error(
+              `Error fetching prediction status (attempts = ${attempts}):`,
+              error,
+            );
+          }
+          if (attempts > 10) {
+            clearInterval(timer); // Stop the timer after 10 attempts
+            // Handle error - display an error message to the user
+            document.getElementById("predictionResult").innerHTML =
+              '<p class="text-red-500">Prediction request timed out. Please try again later.</p>';
+          }
+        }, 600); // Ping every 600ms
+        document.getElementById("predictionResult").innerHTML =
+          '<p class="text-gray-500">Waiting for the results to be predicted...</p>';      
+      }
+    });
+
     // Example data, replace this with the actual API call data
     const exampleData = {
-      working_year: 10,
-      experience_level: "EN",
-      employment_type: "PT",
-      remote_ratio: 50,
-      employment_residence: "BF",
-      company_location: "BL",
-      company_size: "S",
-      estimated_salary: 45000,
-      min_salary: 40000,
-      max_salary: 60000,
+      working_year: "...",
+      experience_level: "...",
+      employment_type: "...",
+      remote_ratio: "...",
+      employment_residence: "...",
+      company_location: "...",
+      company_size: "...",
+      estimated_salary: "...",
+      min_salary: "...",
+      max_salary: "...",
     };
 
     // Call the update function with example data
     updateSalaryPrediction(exampleData);
-  </script>
+
+
+</script>
 </Layout>
 
 <style>

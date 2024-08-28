@@ -72,3 +72,9 @@ source venv/bin/activate
 pip install -r requirements.txt
 ̀```
 
+Then to launch the backend : 
+
+```bash
+FRONTEND_URL=http://localhost:4321
+̀```
+
