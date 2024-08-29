@@ -100,5 +100,5 @@ tensorflow
 xgboost
 pygad
 scikeras
-plotly
 nbformat
+lightgbm
