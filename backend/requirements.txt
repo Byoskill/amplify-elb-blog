@@ -102,3 +102,4 @@ pygad
 scikeras
 nbformat
 lightgbm
+joblib
