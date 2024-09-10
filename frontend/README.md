@@ -62,19 +62,3 @@ PUBLIC_BACKEND_URL=http://localhost:8000 npm run dev
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
 
-### How to build the backend locally
-
-Here are the following instructions to launch the backend : 
-
-̀```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-̀```
-
-Then to launch the backend : 
-
-```bash
-FRONTEND_URL=http://localhost:4321
-̀```
-

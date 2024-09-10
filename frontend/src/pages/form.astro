@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import InputNumber from "../components/forms/InputNumber.astro";
+import InputText from "../components/forms/InputText.astro";
 import InputChoice from "../components/forms/InputChoice.astro";
 import { iso31661, type IsoCode } from "../lib/iso";
 
@@ -53,31 +54,41 @@ const PUBLIC_BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
       method="POST"
       action={PUBLIC_BACKEND_URL + "/api/v1/predict"}
     >
-      <InputNumber name="working_year" title="Number of working years" />
+      <input type="hidden" name="work_year" value="2024">
+      <InputText
+        name="job_title"
+        title="Expected job title"
+        default_value="Data Scientist"        
+      />
       <InputChoice
         name="experience_level"
         title="Experience level"
         choices={default_experience_levels}
+        default_value="MI"
       />
       <InputChoice
         name="employment_type"
         title="Employment type"
         choices={default_employment_types}
+        default_value="FT"
       />
       <InputChoice
         name="remote_ratio"
         title="Remote ratio"
         choices={default_remote_ratios}
+        default_value="100"
       />
       <InputChoice
-        name="employment_residence"
-        title="Employment resident"
+        name="employee_residence"
+        title="Employee resident"
         choices={isoCodes}
+        default_value="US"
       />
       <InputChoice
         name="company_location"
         title="Company location"
         choices={isoCodes}
+        default_value="US"
       />
       <InputChoice
         name="company_size"

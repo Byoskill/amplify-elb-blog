@@ -11,16 +11,17 @@ const PUBLIC_BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
     </h1>
     <div class="flex justify-center">
       <div
-        class="bg-gray-100 dark:bg-gray-800 shadow-lg rounded-lg p-8 max-w-lg w-full"
+        class="bg-gray-100 dark:bg-gray-800 shadow-lg rounded-lg p-8 max-w-2xl w-full mb-12"
+        id="resultCard"
       >
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-2xl font-bold text-center">
             Salary Prediction Result
           </h2>
         </div>
-
+        <div class="flex justify-between items-center mb-6">
         <!-- Displaying Input Parameters -->
-        <div class="mb-12">
+        <div class="mb-12 hidden w-full col-1" id="input">
           <h3 class="text-lg font-semibold">Input Parameters:</h3>
           <ul class="list-disc list-inside">
             <li>Working Year: <span id="workingYear">5</span></li>
@@ -30,83 +31,108 @@ const PUBLIC_BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
             <li>
               Employment Residence: <span id="employmentResidence">BF</span>
             </li>
+            <li>
+              Job Title: <span id="jobTitle"></span>
+            </li>
             <li>Company Location: <span id="companyLocation">BL</span></li>
             <li>Company Size: <span id="companySize">S</span></li>
           </ul>
         </div>
+        <div class="w-full col-2" id="result">
+          <div id="salaryWidget" class="hidden py-6">          <!-- Displaying Predicted Salary -->
+            <h3 class="text-lg font-semibold">Estimated Salary:</h3>
+            <p class="text-3xl font-bold text-green-500" >
+              $ <span id="estimatedSalary">-</span>
+            </p>
+          </div>
 
-        <div class="mb-12" id="predictionResult">
-        <!-- Displaying Predicted Salary -->
-        <div class="mb-12" >
-          <h3 class="text-lg font-semibold">Estimated Salary:</h3>
-          <p class="text-3xl font-bold text-green-500">
-            $<span id="estimatedSalary">45,000</span>
-          </p>
-        </div>
-
-        <!-- Graph for Salary Range -->
         
-          <h3 class="text-lg font-semibold mb-4">Salary Range:</h3>
-          <div class="relative h-4 bg-gray-200 dark:bg-gray-700 rounded">
-            <div
-              id="minSalary"
-              class="absolute left-0 h-full bg-blue-500 rounded-l"
-              style="width: 30%;"
-            >
+          <div class="mb-12" id="uploadingMessage">Loading...</div>
+          <div class="mb-12 hidden" id="predictionResult">
+          <!-- Graph for Salary Range -->
+          
+            <h3 class="text-lg font-semibold mb-4">Salary Range:</h3>
+            <div class="relative h-4 bg-gray-400 dark:bg-gray-700 rounded">
+              <div
+                id="minSalary"
+                class="absolute left-0 h-full bg-blue-500 rounded-l"
+                style="width: 30%;"
+              >
+              </div>
+              <div
+                id="maxSalary"
+                class="absolute right-0 h-full bg-blue-500 rounded-r"
+                style="width: 50%;"
+              >
+              </div>
             </div>
-            <div
-              id="maxSalary"
-              class="absolute right-0 h-full bg-blue-500 rounded-r"
-              style="width: 50%;"
-            >
+            <div class="flex justify-between text-sm mt-2">
+              <span id="minSalaryLabel">$0</span>
+              <span id="maxSalaryLabel">$1</span>
             </div>
-          </div>
-          <div class="flex justify-between text-sm mt-2">
-            <span id="minSalaryLabel">$40,000</span>
-            <span id="maxSalaryLabel">$60,000</span>
           </div>
         </div>
-
+      </div>
         <!-- Button to Request Another Simulation -->
         <div class="mt-8 flex justify-center">
           <a
             href="/form"
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
-            Request Another Simulation
+            Request for another Simulation
           </a>
         </div>
       </div>
     </div>
   </main>
   <script define:vars={{ PUBLIC_BACKEND_URL: PUBLIC_BACKEND_URL }}>
+
+    function findElement(itemId) {
+      try {
+        const elt = document.getElementById(itemId)
+        if (!elt) {
+          console.error(`HTML with id ${itemId} could not be found`)
+        }
+        return elt
+      } catch(err) {
+        console.error(`HTML with id ${itemId} could not be found`, err)
+      }
+    }
+    function toggleClass(elt, cssClass) {
+      // Toggle CSS class ( remove, add)
+      elt.classList.toggle(cssClass);
+    }
+
+    
     // Function to update the page with the actual data
     function updateSalaryPrediction(data) {
-      document.getElementById("workingYear").textContent = data.working_year;
-      document.getElementById("experienceLevel").textContent =
-        data.experience_level;
-      document.getElementById("employmentType").textContent =
-        data.employment_type;
-      document.getElementById("remoteRatio").textContent =
-        data.remote_ratio + "%";
-      document.getElementById("employmentResidence").textContent =
-        data.employment_residence;
-      document.getElementById("companyLocation").textContent =
-        data.company_location;
-      document.getElementById("companySize").textContent = data.company_size;
-
-      document.getElementById("estimatedSalary").textContent =
-        data.estimated_salary.toLocaleString();
+      if (!data ||!data.input) return ;
+      toggleClass(findElement("predictionResult"), "hidden")
+      toggleClass(findElement("uploadingMessage"), "hidden")
+      toggleClass(findElement("input"), "hidden")
+      toggleClass(findElement("salaryWidget"), "hidden")
+      findElement("workingYear").textContent = data.input.work_year;
+      findElement("experienceLevel").textContent = data.input.experience_level;
+      findElement("employmentType").textContent = data.input.employment_type;
+      findElement("remoteRatio").textContent = data.input.remote_ratio + "%";
+      findElement("employmentResidence").textContent = data.input.employee_residence;
+      findElement("jobTitle").textContent = data.input.job_tile;
+      findElement("companyLocation").textContent = data.input.company_location;
+      findElement("companySize").textContent = data.input.company_size;
+      findElement("estimatedSalary").textContent = Math.round(data.salary);
 
       // Update the salary range graph
-      const minPercent = (data.min_salary / data.max_salary) * 100;
-      document.getElementById("minSalary").style.width = minPercent + "%";
-      document.getElementById("maxSalary").style.width = 100 - minPercent + "%";
+      const salary = 50000 // data.salary
+      const avg = (data.min_salary + data.max_salary) / 2      
+      let minPercent = Math.round(Math.abs(salary - avg)  / Math.abs(data.max_salary - data.min_salary ) * 100 ) ;
+            // 5
+      console.log(minPercent)
 
-      document.getElementById("minSalaryLabel").textContent =
-        `$${data.min_salary.toLocaleString()}`;
-      document.getElementById("maxSalaryLabel").textContent =
-        `$${data.max_salary.toLocaleString()}`;
+
+      findElement("minSalary").style.width = minPercent- 5 + "%";
+      findElement("maxSalary").style.width = 95 - minPercent + "%";
+      findElement("minSalaryLabel").textContent = `$${Math.round(data.min_salary).toLocaleString()}`;
+      findElement("maxSalaryLabel").textContent = `$${Math.round(data.max_salary).toLocaleString()}`;
     }
 
     function getPredictionIdFromUrl() {
@@ -143,7 +169,6 @@ const PUBLIC_BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
     async function updatePageWithPrediction(predictionId, backup, timer) {
       const predictionData = await fetchPredictionData(predictionId);
       updateSalaryPrediction(predictionData);
-      document.getElementById("predictionResult").innerHTML = backup;
       clearInterval(timer);
   }
 
@@ -152,16 +177,16 @@ const PUBLIC_BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
       const predictionId = getPredictionIdFromUrl();
       if (predictionId) {
         console.log("Prediction id", predictionId);
-        const backup = document.getElementById("predictionResult").innerHTML;
+        const backup = document.getElementById("uploadingMessage").innerHTML;
         let attempts = 0;
         const timer = setInterval(async () => {
           attempts++;
           try {
             const statusResponse = await fetchPredictionStatus(predictionId);
 
-            if (statusResponse.status === "success") {
+            if (statusResponse.status === "ready") {
               await updatePageWithPrediction(predictionId, backup, timer); // Stop the timer when successful
-              
+              clearInterval(timer); // Stop the timer after 10 attempts              
             }
           } catch (error) {
             console.error(
@@ -172,22 +197,22 @@ const PUBLIC_BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
           if (attempts > 10) {
             clearInterval(timer); // Stop the timer after 10 attempts
             // Handle error - display an error message to the user
-            document.getElementById("predictionResult").innerHTML =
+            document.getElementById("uploadingMessage").innerHTML =
               '<p class="text-red-500">Prediction request timed out. Please try again later.</p>';
           }
         }, 600); // Ping every 600ms
-        document.getElementById("predictionResult").innerHTML =
+        document.getElementById("uploadingMessage").innerHTML =
           '<p class="text-gray-500">Waiting for the results to be predicted...</p>';      
       }
     });
 
     // Example data, replace this with the actual API call data
     const exampleData = {
-      working_year: "...",
+      work_year: "...",
       experience_level: "...",
       employment_type: "...",
       remote_ratio: "...",
-      employment_residence: "...",
+      employee_residence: "...",
       company_location: "...",
       company_size: "...",
       estimated_salary: "...",
@@ -207,12 +232,7 @@ const PUBLIC_BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
     @apply font-semibold text-2xl;
   }
   main {
-    margin: auto;
-    padding: 1rem;
-    width: 800px;
-    max-width: calc(100% - 2rem);
-    font-size: 20px;
-    line-height: 1.6;
+    @apply container mx-auto
   }
   .astro-a {
     position: absolute;

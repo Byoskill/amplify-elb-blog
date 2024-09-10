@@ -6,10 +6,11 @@ interface Choice {
 interface Props {
   title: string;
   name: string;
+  default_value: string;
   choices: Choice[];
 }
 
-const { title, name, choices } = Astro.props;
+const { title, name, choices,default_value } = Astro.props;
 ---
 
 <div class="relative z-0 w-full my-1 py-3 group">
@@ -19,6 +20,7 @@ const { title, name, choices } = Astro.props;
   <select
     id={name}
     name={name}
+    value={default_value}
     class="border border-gray-500 text-sm text-gray-500 dark:text-gray-400 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
     required
   >

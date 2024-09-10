@@ -1,11 +1,16 @@
+import asyncio
 import random
 from typing import Annotated
 import uuid
 from fastapi import FastAPI, Form
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from numpy import float64
 from pydantic import BaseModel
 import os
+
+from ml.predictions import predict_salary
+from ml.salary_prediction_submission import SalaryPredictionSubmission
 
 FRONTEND_URL = os.getenv('FRONTEND_URL')
 
@@ -39,57 +44,65 @@ async def root():
             ]
     };
 
-# working_year: 10
-# experience_level: MI
-# employment_type: FT
-# remote_ratio: 50
-# employment_residence: BB
-# company_location: AX
-# company_size: S
-class FormSubmission(BaseModel):
-    prediction_id: str    
-    working_year: int
-    experience_level: str
-    employment_type: str
-    remote_ratio: int
-    employment_residence: str
-    company_location: str
-    company_size: str
-    predicted_salary: int | None
-    low_salary_range: int | None
-    high_salary_range: int | None
-    status_id : str
-
-
 fake_cache_prediction = dict()
 
+class PredictionStatus(BaseModel):
+    input: SalaryPredictionSubmission
+    status: str
+    salary: float
+    min_salary: float
+    max_salary: float
+    prediction_id: str
+
+
+
+async def predict_salary_task(prediction: PredictionStatus):
+    prediction.status = "processing"
+    (salary, min_salary, max_salary) = await predict_salary(prediction.input)
+    print(f"Predicted salary for {prediction.input.job_title}: ${salary}")
+    prediction.salary = salary
+    prediction.min_salary = min_salary
+    prediction.max_salary = max_salary
+    prediction.status = "ready"
+    # Redirect to the prediction page with the prediction ID
+    return prediction
 
 # Requests for the prediction
 @app.post("/api/v1/predict")
-async def predict(working_year: Annotated[int, Form()],
-                  experience_level: Annotated[str, Form()],
-                  employment_type: Annotated[str, Form()],
-                  remote_ratio: Annotated[int, Form()],
-                  employment_residence: Annotated[str, Form()],
-                  company_location: Annotated[str, Form()],
-                  company_size: Annotated[str, Form()]):
-    
-    submission = FormSubmission(
-        prediction_id=str(uuid.uuid4()),
-        working_year= working_year,
+async def predict(
+                experience_level: Annotated[str, Form()],
+                employment_type: Annotated[str, Form()],
+                remote_ratio: Annotated[int, Form()],
+                work_year: Annotated[str, Form()],
+                employee_residence: Annotated[str, Form()],
+                job_title: Annotated[str, Form()],
+                company_location: Annotated[str, Form()],
+                company_size: Annotated[str, Form()]):
+
+    submission = SalaryPredictionSubmission(
+        work_year= work_year,
         experience_level= experience_level,
         employment_type= employment_type,
+        employee_residence= employee_residence,
+        job_title= job_title,
         remote_ratio= remote_ratio,
-        employment_residence= employment_residence,
         company_location= company_location,
         company_size= company_size,
-        predicted_salary= None,
-        low_salary_range= None,
-        high_salary_range= None,
-        status_id= "not_ready"
     )
-    prediction_id = submission.prediction_id
-    fake_cache_prediction[prediction_id] = submission    
+
+
+    prediction = PredictionStatus(
+        input= submission, 
+        status="not_ready", 
+        salary=-1, 
+        prediction_id = str(uuid.uuid4()),
+        min_salary=0, 
+        max_salary=0
+    )
+    prediction_id = prediction.prediction_id
+    fake_cache_prediction[prediction_id] = prediction
+    # Create a thread and launch the task to make the prediction
+    task = asyncio.create_task(predict_salary_task(prediction))
     response = RedirectResponse(url=f'{FRONTEND_URL}/prediction?prediction={prediction_id}'  )
     return response
 
@@ -98,7 +111,7 @@ async def predict(working_year: Annotated[int, Form()],
 @app.get("/api/v1/prediction/{prediction_id}")
 async def get_prediction(prediction_id: str):
     return fake_cache_prediction[prediction_id]
-    
+
 # Check if the prediction has been established
 @app.get("/api/v1/prediction/status/{prediction_id}")
 async def get_prediction(prediction_id: str):
@@ -106,7 +119,5 @@ async def get_prediction(prediction_id: str):
     if submission is None:
         return { "status": "not_found" }
     else:
-        return { "status": submission.status_id}
+        return { "status": submission.status}
 
-
-    
