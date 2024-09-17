@@ -1,13 +1,15 @@
-import asyncio
-import random
-from typing import Annotated
-import uuid
+from asgiref.wsgi import WsgiToAsgi
+from flask import Flask
 from fastapi import FastAPI, Form
-from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from numpy import float64
 from pydantic import BaseModel
+from typing import Annotated
+import asyncio
 import os
+import random
+import uuid
 
 from ml.predictions import predict_salary
 from ml.salary_prediction_submission import SalaryPredictionSubmission
@@ -121,3 +123,17 @@ async def get_prediction(prediction_id: str):
     else:
         return { "status": submission.status}
 
+## Flask integration
+
+# Flask App
+flask_app = Flask(__name__)
+
+@flask_app.route("/flask")
+def flask_route():
+    return "This is a Flask route!"
+
+# Wrap Flask app with WsgiToAsgi    
+wsgi_app = WsgiToAsgi(flask_app)
+
+# Mount the Flask app in FastAPI
+app.mount("/flask", wsgi_app)
